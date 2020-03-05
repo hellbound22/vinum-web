@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+	<link rel="stylesheet" type="text/css" href="stylee.css">
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+
+
+</head>
+<body>
+
+   <div name="loginform" class="login">
+   	<h1>Tela de Login</h1>
+
+	<div class="textbox">
+		<i class="fas fa-user"></i>
+		<input id="email" placeholder="E-mail" value="">
+	</div>
+
+	<div class="textbox">
+		<i class="fas fa-unlock-alt"></i>
+		<input type="password" id="pssw" placeholder="Senha" value="">
+	</div>
+
+	<input class="btn" type="buttn" onClick="login()" name="" value="Logar">
+   </div>
+
+   <script>
+		   function login(){
+			 var usr = document.getElementById("email").value;
+			 var pssw = document.getElementById("pssw").value;
+			 
+
+				var params = {
+						"user" : usr,
+						"hash" : pssw, 
+				};
+				var request = new XMLHttpRequest();
+
+				request.onreadystatechange = function() {
+						if (request.readyState == XMLHttpRequest.DONE) {
+								r = JSON.parse(request.responseText);
+
+								document.cookie = "token=" + r.token;
+								document.cookie = "cpf=" + r.cpf;
+								window.location.replace("http://localhost:8080/TelaADM.html");
+							}
+				}
+
+				request.open('POST', 'http://18.222.148.185:5000/gen_auth', true);
+				request.send(JSON.stringify(params));
+		   }
+   </script>
+
+</body>
+</html>

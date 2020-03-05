@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="por">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Cadastro Visitante</title>
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <link rel="stylesheet" href="/resources/demos/style.css">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <!-- Bootswatch Theme -->
+    <link rel="stylesheet" href="https://bootswatch.com/4/litera/bootstrap.min.css">
+        <style type="text/css">
+        body {
+            background-image: url(v.jpg);
+            -webkit-background-size: cover;
+            background-size: cover;
+            background-position: center;
+        }
+    </style>
+    <script>
+        $(function () {
+            $("#datepicker").datepicker();
+        });
+    </script>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-light bg-secondary">
+        <a class="navbar-brand" href="#">Cadastro Expositor</a>
+    </nav>
+
+
+    <div class="container">
+        <!-- APPLICATION -->
+        <div id="App" class="row pt-5">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header bg-secondary">
+                        <h4>Cadastro Expositor</h4>
+                    </div>
+                        <div class="form-group">
+                            <input type="text" id="name" placeholder="Empresa" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="cpf" placeholder="CPF"
+                            maxlength="14" OnKeyPress="formatar('###.###.###-##', this)" class="form-control" >
+                        </div>
+                        <div class="form-group">
+                            <input type="text" id="cidade" placeholder="Cidade"
+                                class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <input type="email" id="email" placeholder="E-mail"
+                                class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <input type="password" id="pwd" placeholder="Senha"
+                                class="form-control">
+                        </div>
+                        <input type="buttn" onClick="cadastro()" value="Cadastrar" class="btn btn-primary btn-block">
+                </div>
+            </div>
+
+            
+        </div>
+    </div>
+
+	<script>
+
+			function cadastro(){
+				var params = {
+						"expositor" : document.getElementById("name").value,
+						"cpf" : document.getElementById("cpf").value, 
+						"cidade" : document.getElementById("cidade").value, 
+						"email" : document.getElementById("email").value, 
+						"hash" : document.getElementById("pwd").value, 
+				};
+				var request = new XMLHttpRequest();
+
+				request.onreadystatechange = function() {
+						if (request.readyState == XMLHttpRequest.DONE) {
+								alert(request.responseText);
+							}
+				}
+
+				request.open('POST', 'http://18.222.148.185:5000/cadastro_expositor', true);
+				var cook = getCookie("token");
+				request.setRequestHeader("Jwt-Token", cook);
+				request.send(JSON.stringify(params));
+			}
+
+
+				function getCookie(name) {
+				  var value = "; " + document.cookie;
+				  var parts = value.split("; " + name + "=");
+				  if (parts.length == 2) return parts.pop().split(";").shift();
+				}
+	
+	</script>
+    
+</body>
+
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>QR Scanner Demo</title>
+</head>
+<body>
+<style>
+    canvas {
+        display: none;
+    }
+    hr {
+        margin-top: 32px;
+    }
+    input[type="file"] {
+        display: block;
+        margin-bottom: 16px;
+    }
+    div {
+        margin-bottom: 16px;
+    }
+</style>
+<h1>Scan from WebCam:</h1>
+<div>
+    <video muted playsinline id="qr-video"></video>
+</div>
+<div>
+</div>
+<b>Detected QR code: </b>
+<span id="cam-qr-result">None</span>
+<br>
+<b>Quantidade de degustações: </b>
+<input id="qtd"></input>
+<br>
+<button id="confirmar" onClick="cobranca()">Confirmar</button>
+
+
+<hr>
+
+<script>
+	function cobranca(){
+    			var qtd = document.getElementById('qtd').value;
+    			var comanda = document.getElementById('cam-qr-result').textContent;
+				var cpf = getCookie("cpf");
+				var params = {
+						"comanda" : comanda,
+						"qnt" : qtd, 
+						"cpf_expositor" : cpf,
+
+				};
+
+				var request = new XMLHttpRequest();
+
+				request.onreadystatechange = function() {
+						if (request.readyState == XMLHttpRequest.DONE) {
+								alert(request.responseText);
+							}
+				}
+
+				request.open('POST', 'http://18.222.148.185:5000/expositor/cobrar', true);
+				var cook = getCookie("token");
+				request.setRequestHeader("Jwt-Token", cook);
+				request.send(JSON.stringify(params));
+			}
+
+
+		function getCookie(name) {
+		  var value = "; " + document.cookie;
+		  var parts = value.split("; " + name + "=");
+		  if (parts.length == 2) return parts.pop().split(";").shift();
+		}
+
+</script>
+
+<script type="module">
+    import QrScanner from "../qr-scanner.min.js";
+    QrScanner.WORKER_PATH = '../qr-scanner-worker.min.js';
+
+    const video = document.getElementById('qr-video');
+    const camHasCamera = document.getElementById('cam-has-camera');
+    const camQrResult = document.getElementById('cam-qr-result');
+    const camQrResultTimestamp = document.getElementById('cam-qr-result-timestamp');
+    const fileSelector = document.getElementById('file-selector');
+    const fileQrResult = document.getElementById('file-qr-result');
+
+
+    function setResult(label, result) {
+        label.textContent = result;
+        camQrResultTimestamp.textContent = new Date().toString();
+        label.style.color = 'teal';
+        clearTimeout(label.highlightTimeout);
+        label.highlightTimeout = setTimeout(() => label.style.color = 'inherit', 100);
+    }
+
+    // ####### Web Cam Scanning #######
+
+    QrScanner.hasCamera().then(hasCamera => camHasCamera.textContent = hasCamera);
+
+    const scanner = new QrScanner(video, result => setResult(camQrResult, result));
+    scanner.start();
+
+    document.getElementById('inversion-mode-select').addEventListener('change', event => {
+        scanner.setInversionMode(event.target.value);
+    });
+
+    // ####### File Scanning #######
+
+    fileSelector.addEventListener('change', event => {
+        const file = fileSelector.files[0];
+        if (!file) {
+            return;
+        }
+        QrScanner.scanImage(file)
+            .then(result => setResult(fileQrResult, result))
+            .catch(e => setResult(fileQrResult, e || 'No QR code found.'));
+    });
+
+
+	
+</script>
+</body>
+</html>
